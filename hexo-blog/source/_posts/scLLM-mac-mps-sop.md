@@ -124,8 +124,8 @@ print(f'torch: {torch.__version__}, MPS: {torch.backends.mps.is_available()}')
 ```bash
 # ⚠️ jkobject/geneformer 仓库 LFS 配额超限，git clone 会失败
 # 用 GitHub tarball 直接拿源码（不下载 LFS 大对象，仅 ~3MB）
-mkdir -p /Users/lijiangbo/3_Toolbox/Bioinfo/scLLM/repos
-cd /Users/lijiangbo/3_Toolbox/Bioinfo/scLLM/repos
+mkdir -p <PROJECT_ROOT>/repos
+cd <PROJECT_ROOT>/repos
 curl -L https://codeload.github.com/jkobject/geneformer/tar.gz/main -o geneformer.tar.gz
 tar -xzf geneformer.tar.gz && mv geneformer-main geneformer && rm geneformer.tar.gz
 ```
@@ -135,13 +135,13 @@ tar -xzf geneformer.tar.gz && mv geneformer-main geneformer && rm geneformer.tar
 ```bash
 # 用 hf-mirror.com 镜像
 export HF_ENDPOINT=https://hf-mirror.com
-export HF_HOME=/Users/lijiangbo/3_Toolbox/Bioinfo/scLLM/data/hf_cache
+export HF_HOME=<DATA_DIR>/hf_cache
 
 python <<'EOF'
 import os
 os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
 from huggingface_hub import snapshot_download
-BASE = "/Users/lijiangbo/3_Toolbox/Bioinfo/scLLM/data/genecorpus-30m"
+BASE = "<DATA_DIR>/genecorpus-30m"
 snapshot_download(repo_id="ctheodoris/Genecorpus-30M", repo_type="dataset",
                   allow_patterns=["example_input_files/cell_classification/disease_classification/human_dcm_hcm_nf.dataset/*",
                                   "example_input_files/cell_classification/cardiomyopathies/cardiomyopathies.dataset/*",
@@ -153,7 +153,7 @@ EOF
 ### 4.3 修复 .arrow 文件名（**避坑点 5**）
 
 ```bash
-DATA=/Users/lijiangbo/3_Toolbox/Bioinfo/scLLM/data/genecorpus-30m
+DATA=<DATA_DIR>/genecorpus-30m
 for DIR in $DATA/cell_classification/disease_classification/human_dcm_hcm_nf.dataset \
            $DATA/cell_classification/cardiomyopathies/cardiomyopathies.dataset \
            $DATA/gene_classification/dosage_sensitive_tfs; do
@@ -173,8 +173,8 @@ done
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-ROOT = "/Users/lijiangbo/3_Toolbox/Bioinfo/scLLM"
-MODEL = "/Users/lijiangbo/3_Toolbox/Bioinfo/models/geneformer-12L-30M/V1-10M"
+ROOT = "<PROJECT_ROOT>"
+MODEL = "<MODEL_DIR>/V1-10M"
 INPUT_DATA = f"{ROOT}/data/genecorpus-30m/cell_classification/disease_classification/human_dcm_hcm_nf.dataset"
 OUT = f"{ROOT}/logs/emb_extract"; os.makedirs(OUT, exist_ok=True)
 

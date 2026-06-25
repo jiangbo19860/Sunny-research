@@ -20,8 +20,6 @@ cover: /images/myforestplot_cover.png
 abbrlink: myforestplot-sop-2026
 ---
 
-> **Hermes**: 本 SOP 是 Sunny-research "科研工具实测系列"第 1 篇。聚焦：① 真实跑通 ② API 穷举测试 ③ library bug 修复 ④ 输出即用代码。所有命令可直接复制运行。
-
 # 🎯 一句话定位
 
 > **myforestplot = Python 版的 R `forestplot` + `forestmodel`**，专为 statsmodels / scikit-survival 输出设计，支持 Meta-analysis、Logistic 回归、Cox 回归的森林图自动化绘制。
@@ -326,7 +324,7 @@ pretty_df = mfp.statsmodels_pretty_result_dataframe(
 ## 📖 9. 完整测试代码
 
 完整的 14 个 API 测试脚本（340 行）：
-- `~/3_Toolbox/Bioinfo/forestplot/test_all_v2.py`
+- `<PROJECT_ROOT>/test_all_v2.py`
 
 直接 `python test_all_v2.py` 即可重跑，结果与本文完全一致。
 
