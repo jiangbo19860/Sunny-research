@@ -36,7 +36,7 @@ git_push() {
   if [ -n "$(git status --porcelain)" ]; then
     git add -A
     git commit -m "Daily deploy: $TIMESTAMP" 2>&1 | tail -1
-    git push origin main 2>&1 | tail -1
+    zoeb-push . push origin main 2>&1 | tail -1
   else
     echo "   无变更，跳过"
   fi
