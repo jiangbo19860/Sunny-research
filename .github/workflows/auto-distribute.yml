@@ -1,0 +1,62 @@
+name: Auto-distribute Hexo posts
+
+# 触发条件: source/_posts 目录有变化
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'hexo-blog/source/_posts/**'
+
+# 允许手动触发
+  workflow_dispatch:
+    inputs:
+      post_file:
+        description: '文章文件名 (相对 hexo-blog/source/_posts/)'
+        required: true
+        type: string
+
+jobs:
+  distribute:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install dependencies
+        run: |
+          pip install requests pyyaml
+
+      - name: 🚀 Auto-distribute (commit info → multi-platform files)
+        env:
+          POST_FILE: ${{ github.event.inputs.post_file || format('AUTO:{0}', github.event.head_commit.message) }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 .github/workflows/auto_distribute.py
+
+      - name: 📤 Upload distribution artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-output
+          path: dist/
+          retention-days: 30
+
+      - name: 💬 Comment on commit (PR mode)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const dist = fs.readdirSync('dist').filter(f => !f.startsWith('.'));
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `✅ 已生成多平台分发文件: ${dist.join(', ')}\n\n下载 artifacts 后到各平台后台粘贴发布。`
+            });

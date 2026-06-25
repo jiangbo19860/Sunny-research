@@ -5,3 +5,4 @@ db.json
 *.log
 .DS_Store
 hexo-blog/themes/fluid/
+dist/
