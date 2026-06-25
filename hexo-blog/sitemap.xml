@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://zhuer.github.io/2026/06/26/pyecharts-full-sop-2026/</loc>
+    
+    <lastmod>2026-06-25</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://zhuer.github.io/2026/06/26/myforestplot-sop-2026/</loc>
     
     <lastmod>2026-06-25</lastmod>
@@ -27,6 +36,41 @@
     <priority>1.0</priority>
   </url>
 
+  
+  <url>
+    <loc>https://zhuer.github.io/tags/SOP/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://zhuer.github.io/tags/%E5%8F%AF%E8%A7%86%E5%8C%96/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://zhuer.github.io/tags/pyecharts/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://zhuer.github.io/tags/ECharts/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://zhuer.github.io/tags/Python/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
   
   <url>
     <loc>https://zhuer.github.io/tags/forest-plot/</loc>
@@ -150,20 +194,6 @@
   </url>
   
   <url>
-    <loc>https://zhuer.github.io/categories/%E7%A7%91%E7%A0%94%E5%B7%A5%E5%85%B7/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96/</loc>
-    <lastmod>2026-06-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://zhuer.github.io/categories/%E7%A7%91%E7%A0%94%E5%B7%A5%E5%85%B7/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96/SOP-%E6%95%99%E7%A8%8B/</loc>
-    <lastmod>2026-06-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://zhuer.github.io/categories/%E5%8D%95%E7%BB%86%E8%83%9E%E6%B5%8B%E5%BA%8F/</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
@@ -171,7 +201,21 @@
   </url>
   
   <url>
+    <loc>https://zhuer.github.io/categories/%E7%A7%91%E7%A0%94%E5%B7%A5%E5%85%B7/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://zhuer.github.io/categories/%E5%8D%95%E7%BB%86%E8%83%9E%E6%B5%8B%E5%BA%8F/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://zhuer.github.io/categories/%E7%A7%91%E7%A0%94%E5%B7%A5%E5%85%B7/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96/SOP-%E6%95%99%E7%A8%8B/</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
