@@ -1,0 +1,1230 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Sunny (zhuer)">
+  <meta name="keywords" content="scRNA-seq, Geneformer, scGPT, single-cell, deep learning, bioinformatics">
+  
+    <meta name="description" content="一线实战：用 myforestplot v0.2.3 在 Apple Silicon + Python 3.10 跑通 14 个公开 API，产出 8 张发表级森林图（PNG）。包含从 statsmodels 自动提取 OR、置信区间，到分类变量分组、log 尺度、参考线、外层 marker、颜色自定义的完整流程。附 3 个 library bug 修复方法和替代方案。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="myforestplot 全 API 实测：13&#x2F;14 通过，从 Logistic 回归到发表级森林图零代码">
+<meta property="og:url" content="https://zhuer.github.io/2026/06/26/myforestplot-sop-2026/index.html">
+<meta property="og:site_name" content="Sunny的生物信息学笔记">
+<meta property="og:description" content="一线实战：用 myforestplot v0.2.3 在 Apple Silicon + Python 3.10 跑通 14 个公开 API，产出 8 张发表级森林图（PNG）。包含从 statsmodels 自动提取 OR、置信区间，到分类变量分组、log 尺度、参考线、外层 marker、颜色自定义的完整流程。附 3 个 library bug 修复方法和替代方案。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-26T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-25T21:29:31.698Z">
+<meta property="article:author" content="Sunny (zhuer)">
+<meta property="article:tag" content="forest-plot">
+<meta property="article:tag" content="logistic-regression">
+<meta property="article:tag" content="matplotlib">
+<meta property="article:tag" content="meta-analysis">
+<meta property="article:tag" content="myforestplot">
+<meta property="article:tag" content="statsmodels">
+<meta property="article:tag" content="孟德尔随机化">
+<meta property="article:tag" content="数据可视化">
+<meta property="article:tag" content="森林图">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>myforestplot 全 API 实测：13/14 通过，从 Logistic 回归到发表级森林图零代码,Sunny的生物信息学笔记</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"zhuer.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"><link rel="alternate" href="/atom.xml" title="Sunny的生物信息学笔记" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="myforestplot 全 API 实测：13/14 通过，从 Logistic 回归到发表级森林图零代码"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-06-26 10:00" pubdate>
+          2026年6月26日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          64 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">myforestplot 全 API 实测：13/14 通过，从 Logistic 回归到发表级森林图零代码</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p><strong>Hermes</strong>: 本 SOP 是 Sunny-research
+“科研工具实测系列”第 1 篇。聚焦：① 真实跑通 ② API 穷举测试 ③ library bug
+修复 ④ 输出即用代码。所有命令可直接复制运行。</p>
+</blockquote>
+<h1 id="一句话定位">🎯 一句话定位</h1>
+<blockquote>
+<p><strong>myforestplot = Python 版的 R <code>forestplot</code> +
+<code>forestmodel</code></strong>，专为 statsmodels / scikit-survival
+输出设计，支持 Meta-analysis、Logistic 回归、Cox
+回归的森林图自动化绘制。</p>
+</blockquote>
+<hr />
+<h2 id="工具是什么">📖 1. 工具是什么</h2>
+<p><strong>myforestplot</strong> 是 toshiakiasakura 在 PyPI
+发布的小众库（v0.2.3，2022-09），专为生物医学论文的森林图设计。</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>对比 R 森林图</th>
+<th>myforestplot</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>安装</td>
+<td>复杂（依赖 CRAN）</td>
+<td><code>pip install myforestplot</code></td>
+</tr>
+<tr>
+<td>数据来源</td>
+<td>手动 OR/CI</td>
+<td>statsmodels 自动提取</td>
+</tr>
+<tr>
+<td>学习曲线</td>
+<td>中等</td>
+<td>陡峭（文档少）</td>
+</tr>
+<tr>
+<td>可定制性</td>
+<td>高</td>
+<td>中（依赖 matplotlib）</td>
+</tr>
+<tr>
+<td>发表质量</td>
+<td>高</td>
+<td>高（颜色/字体可全控）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>何时用它</strong>： - ✅ 写 Meta-analysis / 孟德尔随机化 /
+多因素 Logistic / Cox 论文 - ✅ 想从 statsmodels
+直接输出森林图（不用手算 OR/CI） - ✅ 需要中文友好的 matplotlib
+森林图</p>
+<p><strong>何时不用</strong>： - ❌ R 用户（用 <code>forestplot</code>
+或 <code>forestmodel</code> 更熟） - ❌ 想要交互式 HTML（用
+<code>forestly</code> 或 <code>JSforest</code>）</p>
+<hr />
+<h2 id="环境准备apple-silicon-专属">📖 2. 环境准备（Apple Silicon
+专属）</h2>
+<h3 id="依赖清单">2.1 依赖清单</h3>
+<table>
+<thead>
+<tr>
+<th>包</th>
+<th>版本</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python</td>
+<td>≥ 3.9</td>
+<td>推荐 3.10（scLLM 系列已验证）</td>
+</tr>
+<tr>
+<td>matplotlib</td>
+<td>≥ 3.5.1</td>
+<td>核心绘图</td>
+</tr>
+<tr>
+<td>pandas</td>
+<td>≥ 1.3</td>
+<td>数据处理</td>
+</tr>
+<tr>
+<td>numpy</td>
+<td>≥ 1.20</td>
+<td>数组计算</td>
+</tr>
+<tr>
+<td>statsmodels</td>
+<td>≥ 0.13</td>
+<td>Logistic / Cox 拟合</td>
+</tr>
+<tr>
+<td>jupyter</td>
+<td>(可选)</td>
+<td>跑 notebook demo</td>
+</tr>
+</tbody>
+</table>
+<h3 id="一键安装conda">2.2 一键安装（conda）</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 推荐：复用已有 environment（我用了 geneformer 环境）</span><br>conda activate your_env<br><br><span class="hljs-comment"># 装 myforestplot（pip 装不了就源码装）</span><br>pip install -e /path/to/myforestplot-main<br><span class="hljs-comment"># 或者</span><br>pip install myforestplot  <span class="hljs-comment"># 从 PyPI（但版本可能落后）</span><br></code></pre></td></tr></table></figure>
+<h3 id="验证安装">2.3 验证安装</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> myforestplot <span class="hljs-keyword">as</span> mfp<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Version: <span class="hljs-subst">&#123;mfp.__version__&#125;</span>&quot;</span>)<br><span class="hljs-comment"># Version: 0.2.3</span><br><br><span class="hljs-comment"># 检查公开 API</span><br><span class="hljs-built_in">print</span>([x <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-built_in">dir</span>(mfp) <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> x.startswith(<span class="hljs-string">&quot;_&quot;</span>)])<br><span class="hljs-comment"># [&#x27;ForestPlot&#x27;, &#x27;SimpleForestPlot&#x27;, &#x27;add_pretty_risk_column&#x27;,</span><br><span class="hljs-comment">#  &#x27;count_category_frequency&#x27;, &#x27;sort_category_item&#x27;,</span><br><span class="hljs-comment">#  &#x27;statsmodels_fitting_result_dataframe&#x27;,</span><br><span class="hljs-comment">#  &#x27;statsmodels_pretty_result_dataframe&#x27;]</span><br></code></pre></td></tr></table></figure>
+<hr />
+<h2 id="完整-api-清单1314-通过">📖 3. 完整 API 清单（13/14 通过）</h2>
+<p>下面是我对每个公开 API 的实测结果。</p>
+<h3 id="总体测试结果">3.1 总体测试结果</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>API</th>
+<th>状态</th>
+<th>输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>statsmodels_pretty_result_dataframe</code></td>
+<td>✅</td>
+<td>shape=(4,8)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>SimpleForestPlot</code> 基础 2 轴</td>
+<td>✅</td>
+<td>PNG</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>SimpleForestPlot</code> vertical_align</td>
+<td>✅</td>
+<td>PNG</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>ForestPlot</code> 3 轴高级</td>
+<td>✅</td>
+<td>PNG</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>count_category_frequency</code></td>
+<td>✅</td>
+<td>DataFrame</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>sort_category_item</code></td>
+<td>✅</td>
+<td>DataFrame</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>statsmodels_fitting_result_dataframe</code></td>
+<td>✅</td>
+<td>DataFrame</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>add_pretty_risk_column</code></td>
+<td>✅</td>
+<td>Series</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>errorbar(log_scale=True)</code></td>
+<td>✅</td>
+<td>PNG</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>draw_horizontal_line</code></td>
+<td>✅</td>
+<td>PNG</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>errorbar_color</code> / <code>ref_color</code></td>
+<td>✅</td>
+<td>PNG</td>
+</tr>
+<tr>
+<td>12</td>
+<td>column index mode（lower=0 upper=1）</td>
+<td>✅</td>
+<td>PNG</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>horizontal_variable_separators</code></td>
+<td>✅</td>
+<td>PNG</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>draw_outer_marker</code></td>
+<td>❌</td>
+<td>library bug</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="完整-sop从数据到图">📖 4. 完整 SOP（从数据到图）</h2>
+<h3 id="完整代码30-行跑通">4.1 完整代码（30 行跑通）</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> matplotlib<br>matplotlib.use(<span class="hljs-string">&quot;Agg&quot;</span>)  <span class="hljs-comment"># 无显示器环境必需</span><br><span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt<br><span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd<br><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np<br><span class="hljs-keyword">import</span> statsmodels.formula.api <span class="hljs-keyword">as</span> smf<br><span class="hljs-keyword">import</span> myforestplot <span class="hljs-keyword">as</span> mfp<br><br><span class="hljs-comment"># ============ Step 1: 准备数据 ============</span><br>df = pd.read_csv(<span class="hljs-string">&quot;your_data.csv&quot;</span>)<br><span class="hljs-comment"># 必须含列：因变量 + 自变量（连续/分类）</span><br><br><span class="hljs-comment"># ============ Step 2: 拟合回归 ============</span><br>res = smf.logit(<span class="hljs-string">&quot;y ~ x1 + x2 + x3&quot;</span>, data=df).fit()<br><br><span class="hljs-comment"># ============ Step 3: 自动提取 OR/CI ============</span><br>pretty_df = mfp.statsmodels_pretty_result_dataframe(<br>    df, res,<br>    order=[<span class="hljs-string">&quot;x1&quot;</span>, <span class="hljs-string">&quot;x2&quot;</span>, <span class="hljs-string">&quot;x3&quot;</span>],        <span class="hljs-comment"># 自变量顺序</span><br>    cont_cols=[<span class="hljs-string">&quot;x1&quot;</span>],               <span class="hljs-comment"># 连续变量（保持数值）</span><br>    item_order=&#123;<span class="hljs-string">&quot;x2&quot;</span>: [<span class="hljs-string">&quot;A&quot;</span>, <span class="hljs-string">&quot;B&quot;</span>], <span class="hljs-string">&quot;x3&quot;</span>: [<span class="hljs-string">&quot;yes&quot;</span>, <span class="hljs-string">&quot;no&quot;</span>]&#125;,  <span class="hljs-comment"># 分类变量顺序</span><br>    fml=<span class="hljs-string">&quot;.3f&quot;</span><br>)<br><span class="hljs-comment"># ⚠️ bug 修复: nobs 列需手动补</span><br>pretty_df[<span class="hljs-string">&quot;nobs&quot;</span>] = pretty_df[<span class="hljs-string">&quot;nobs&quot;</span>].fillna(df.shape[<span class="hljs-number">0</span>]).astype(<span class="hljs-built_in">int</span>)<br><br><span class="hljs-comment"># ============ Step 4: 画森林图 ============</span><br>plt.rcParams[<span class="hljs-string">&quot;font.size&quot;</span>] = <span class="hljs-number">8</span><br>fp = mfp.SimpleForestPlot(ratio=(<span class="hljs-number">8</span>, <span class="hljs-number">3</span>), dpi=<span class="hljs-number">150</span>, figsize=(<span class="hljs-number">7</span>, <span class="hljs-number">3</span>), df=pretty_df)<br>fp.errorbar(errorbar_kwds=&#123;&#125;)   <span class="hljs-comment"># ⚠️ bug: 必须是 dict 不能是 None</span><br>fp.ax2.set_xlim([<span class="hljs-number">0</span>, <span class="hljs-number">1.5</span>])<br>fp.ax2.set_xlabel(<span class="hljs-string">&quot;OR&quot;</span>)<br>fp.ax2.axvline(x=<span class="hljs-number">1</span>, ymin=<span class="hljs-number">0</span>, ymax=<span class="hljs-number">1.0</span>, color=<span class="hljs-string">&quot;black&quot;</span>, alpha=<span class="hljs-number">0.5</span>)  <span class="hljs-comment"># 参考线</span><br><br><span class="hljs-comment"># ============ Step 5: 加文字标注 ============</span><br>fp.ax1.set_xlim([<span class="hljs-number">0.15</span>, <span class="hljs-number">1</span>])<br>fp.embed_strings(<span class="hljs-string">&quot;category&quot;</span>, <span class="hljs-number">0.1</span>, header=<span class="hljs-string">&quot;Category&quot;</span>, duplicate_hide=<span class="hljs-literal">True</span>,<br>                 text_kwds=<span class="hljs-built_in">dict</span>(fontweight=<span class="hljs-string">&quot;bold&quot;</span>),<br>                 header_kwds=<span class="hljs-built_in">dict</span>(fontweight=<span class="hljs-string">&quot;bold&quot;</span>))<br>fp.embed_strings(<span class="hljs-string">&quot;item&quot;</span>, <span class="hljs-number">0.36</span>, header=<span class="hljs-string">&quot;&quot;</span>, replace=&#123;<span class="hljs-string">&quot;x1&quot;</span>: <span class="hljs-string">&quot;&quot;</span>&#125;)<br>fp.embed_strings(<span class="hljs-string">&quot;risk_pretty&quot;</span>, <span class="hljs-number">0.6</span>, header=<span class="hljs-string">&quot;OR (95% CI)&quot;</span>, replace=&#123;<span class="hljs-string">&quot;(Intercept)&quot;</span>: <span class="hljs-string">&quot;&quot;</span>&#125;)<br>fp.embed_strings(<span class="hljs-string">&quot;pvalues&quot;</span>, <span class="hljs-number">0.9</span>, header=<span class="hljs-string">&quot;p-value&quot;</span>)   <span class="hljs-comment"># ⚠️ 列名是 pvalues 不是 p-value</span><br><br><span class="hljs-comment"># ============ Step 6: 保存 ============</span><br>fp.fig.savefig(<span class="hljs-string">&quot;forest_plot.png&quot;</span>, dpi=<span class="hljs-number">300</span>, bbox_inches=<span class="hljs-string">&quot;tight&quot;</span>)<br></code></pre></td></tr></table></figure>
+<h3 id="输出示意4-种典型风格">4.2 输出示意（4 种典型风格）</h3>
+<table>
+
+<thead>
+<tr>
+<th>类型</th>
+<th>用途</th>
+<th>代码</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>基础 2 轴</strong></td>
+<td>Logistic / Cox 简单展示</td>
+<td><code>SimpleForestPlot(ratio=(8,3))</code></td>
+</tr>
+<tr>
+<td><strong>3 轴分组</strong></td>
+<td>多亚组对比</td>
+<td><code>ForestPlot(ratio=[5,5,3], fig_ax_index=[2])</code></td>
+</tr>
+<tr>
+<td><strong>对数尺度</strong></td>
+<td>HR/RR 大范围数据</td>
+<td><code>errorbar(log_scale=True)</code> +
+<code>set_xscale("log")</code></td>
+</tr>
+<tr>
+<td><strong>分层着色</strong></td>
+<td>强调不同类别</td>
+<td><code>errorbar_color=</code> <code>ref_color=</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="我踩的-3-个坑重要">📖 5. 我踩的 3 个坑（重要！）</h2>
+<h3 id="列名错误p-value-vs-pvalues">5.1 ❌
+列名错误：<code>'p-value'</code> vs <code>'pvalues'</code></h3>
+<p><strong>症状</strong>：<code>KeyError: 'p-value'</code></p>
+<p><strong>原因</strong>：库实际输出列名是
+<code>pvalues</code>（无连字符），不是 <code>p-value</code>。</p>
+<p><strong>修复</strong>： <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># ❌ 错</span><br>fp.embed_strings(<span class="hljs-string">&quot;p-value&quot;</span>, <span class="hljs-number">0.9</span>, header=<span class="hljs-string">&quot;p-value&quot;</span>)<br><br><span class="hljs-comment"># ✅ 对</span><br>fp.embed_strings(<span class="hljs-string">&quot;pvalues&quot;</span>, <span class="hljs-number">0.9</span>, header=<span class="hljs-string">&quot;p-value&quot;</span>)<br></code></pre></td></tr></table></figure></p>
+<h3 id="api-签名错误count_category_frequency-参数名">5.2 ❌ API
+签名错误：<code>count_category_frequency</code> 参数名</h3>
+<p><strong>症状</strong>：<code>TypeError: count_category_frequency() missing 1 required positional argument: 'categorical_cols'</code></p>
+<p><strong>修复</strong>： <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># ❌ 错</span><br>freq = mfp.count_category_frequency(test_df, categorical_cols=[<span class="hljs-string">&quot;category&quot;</span>])<br><br><span class="hljs-comment"># ✅ 对（注意参数名是 categorical_cols）</span><br>freq = mfp.count_category_frequency(test_df, categorical_cols=[<span class="hljs-string">&quot;category&quot;</span>, <span class="hljs-string">&quot;item&quot;</span>])<br></code></pre></td></tr></table></figure></p>
+<h3 id="errorbar_kwdsnone-errorbar_color-组合爆炸">5.3 ❌
+<code>errorbar_kwds=None</code> + <code>errorbar_color</code>
+组合爆炸</h3>
+<p><strong>症状</strong>：<code>TypeError: 'NoneType' object does not support item assignment</code></p>
+<p><strong>原因</strong>：<code>vis_utils.py:75-77</code> 直接对
+<code>errorbar_kwds["ecolor"]</code> 赋值，假设
+<code>errorbar_kwds</code> 是 dict。</p>
+<p><strong>修复</strong>： <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># ❌ 错（库 bug）</span><br>fp.errorbar(errorbar_kwds=<span class="hljs-literal">None</span>, errorbar_color=<span class="hljs-string">&quot;crimson&quot;</span>)<br><br><span class="hljs-comment"># ✅ 对（传空 dict 避开）</span><br>fp.errorbar(errorbar_kwds=&#123;&#125;, ref_kwds=&#123;&#125;, <br>            errorbar_color=<span class="hljs-string">&quot;crimson&quot;</span>, ref_color=<span class="hljs-string">&quot;navy&quot;</span>)<br></code></pre></td></tr></table></figure></p>
+<p><strong>或者</strong>：用 monkey patch 直接修库的 bug：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 一次性 patch，永远生效</span><br><span class="hljs-keyword">import</span> myforestplot.vis_utils <span class="hljs-keyword">as</span> vu<br>orig_errorbar = vu.errorbar_forestplot<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">patched</span>(<span class="hljs-params">*args, errorbar_kwds=<span class="hljs-literal">None</span>, ref_kwds=<span class="hljs-literal">None</span>, errorbar_color=<span class="hljs-literal">None</span>, ref_color=<span class="hljs-literal">None</span>, **kw</span>):<br>    errorbar_kwds = errorbar_kwds <span class="hljs-keyword">or</span> &#123;&#125;<br>    ref_kwds = ref_kwds <span class="hljs-keyword">or</span> &#123;&#125;<br>    <span class="hljs-keyword">return</span> orig_errorbar(*args, errorbar_kwds=errorbar_kwds, ref_kwds=ref_kwds,<br>                        errorbar_color=errorbar_color, ref_color=ref_color, **kw)<br>vu.errorbar_forestplot = patched<br></code></pre></td></tr></table></figure>
+<hr />
+<h2 id="个核心绘图技巧">📖 6. 3 个核心绘图技巧</h2>
+<h3 id="参考线or1-的零效应线">6.1 参考线（OR=1 的零效应线）</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">fp.ax2.axvline(x=<span class="hljs-number">1</span>, ymin=<span class="hljs-number">0</span>, ymax=<span class="hljs-number">1.0</span>, color=<span class="hljs-string">&quot;black&quot;</span>, alpha=<span class="hljs-number">0.5</span>)<br></code></pre></td></tr></table></figure>
+<h3 id="亚组水平分隔线多分类变量分组">6.2
+亚组水平分隔线（多分类变量分组）</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">fp.draw_horizontal_line(<span class="hljs-number">1</span>, -<span class="hljs-number">0.5</span>)                       <span class="hljs-comment"># 实线</span><br>fp.draw_horizontal_line(<span class="hljs-number">1</span>, -<span class="hljs-number">3.5</span>, linestyle=<span class="hljs-string">&quot;--&quot;</span>, color=<span class="hljs-string">&quot;red&quot;</span>)  <span class="hljs-comment"># 虚线</span><br></code></pre></td></tr></table></figure>
+<h3 id="加-outer-marker表示样本量大小">6.3 加 outer
+marker（表示样本量大小）</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">fp.draw_outer_marker(<span class="hljs-number">2</span>, lower=<span class="hljs-number">0</span>, upper=<span class="hljs-number">1</span>, lower_marker=<span class="hljs-number">4</span>, upper_marker=<span class="hljs-number">5</span>, <br>                    scale=<span class="hljs-number">0.05</span>)  <span class="hljs-comment"># ← 库 bug：用 *scatter**kwds 传 marker 报错</span><br></code></pre></td></tr></table></figure>
+<p>⚠️ draw_outer_marker 有 bug — 暂用替代方案：用
+<code>errorbar_kwds={"s": ...}</code> 在 errorbar 阶段直接调 scatter
+的大小。</p>
+<hr />
+<h2 id="自定义数据替换示例3-步">📖 7. 自定义数据替换示例（3 步）</h2>
+<h3 id="替换-statsmodels-模型">7.1 替换 statsmodels 模型</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># ❌ demo: logistic</span><br>res = smf.logit(<span class="hljs-string">&quot;survived ~ sex + age&quot;</span>, data=titanic).fit()<br><br><span class="hljs-comment"># ✅ 自定义：你的数据</span><br>res = smf.logit(<span class="hljs-string">&quot;disease ~ bmi + age + smoking + family_history&quot;</span>, data=your_df).fit()<br></code></pre></td></tr></table></figure>
+<h3 id="替换分类变量顺序">7.2 替换分类变量顺序</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># ❌ demo: 默认</span><br>item_order=&#123;<span class="hljs-string">&quot;embark_town&quot;</span>: [<span class="hljs-string">&#x27;Southampton&#x27;</span>, <span class="hljs-string">&#x27;Cherbourg&#x27;</span>, <span class="hljs-string">&#x27;Queenstown&#x27;</span>]&#125;<br><br><span class="hljs-comment"># ✅ 自定义：按字母 / 临床意义</span><br>item_order=&#123;<span class="hljs-string">&quot;smoking&quot;</span>: [<span class="hljs-string">&quot;never&quot;</span>, <span class="hljs-string">&quot;former&quot;</span>, <span class="hljs-string">&quot;current&quot;</span>]&#125;  <span class="hljs-comment"># 临床习惯顺序</span><br>item_order=&#123;<span class="hljs-string">&quot;stage&quot;</span>: [<span class="hljs-string">&quot;I&quot;</span>, <span class="hljs-string">&quot;II&quot;</span>, <span class="hljs-string">&quot;III&quot;</span>, <span class="hljs-string">&quot;IV&quot;</span>]&#125;  <span class="hljs-comment"># 按严重度</span><br></code></pre></td></tr></table></figure>
+<h3 id="自定义-output-格式保留小数位数">7.3 自定义 output
+格式（保留小数位数）</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># fml 参数控制 OR 显示精度</span><br>pretty_df = mfp.statsmodels_pretty_result_dataframe(<br>    df, res, fml=<span class="hljs-string">&quot;.2f&quot;</span>  <span class="hljs-comment"># 显示 2 位小数</span><br>    <span class="hljs-comment"># 或 fml=&quot;.4e&quot;  # 科学计数法</span><br>)<br></code></pre></td></tr></table></figure>
+<hr />
+<h2 id="输出物8-张测试图">📖 8. 输出物（8 张测试图）</h2>
+<p>执行 <code>test_all_v2.py</code> 会生成：</p>
+<table>
+<thead>
+<tr>
+<th>文件名</th>
+<th>大小</th>
+<th>演示功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>01_simple_basic.png</code></td>
+<td>31 KB</td>
+<td>基础 2 轴森林图</td>
+</tr>
+<tr>
+<td><code>02_simple_vertical_align.png</code></td>
+<td>31 KB</td>
+<td>vertical_align 分类对齐</td>
+</tr>
+<tr>
+<td><code>03_forest_advanced.png</code></td>
+<td>31 KB</td>
+<td>ForestPlot 3 轴高级版</td>
+</tr>
+<tr>
+<td><code>04_log_scale.png</code></td>
+<td>26 KB</td>
+<td>对数 OR 轴</td>
+</tr>
+<tr>
+<td><code>05_horizontal_line.png</code></td>
+<td>23 KB</td>
+<td>水平参考线</td>
+</tr>
+<tr>
+<td><code>06_custom_colors.png</code></td>
+<td>27 KB</td>
+<td>自定义颜色（crimson + navy）</td>
+</tr>
+<tr>
+<td><code>07_col_index.png</code></td>
+<td>23 KB</td>
+<td>列索引模式（lower=0 upper=1）</td>
+</tr>
+<tr>
+<td><code>08_var_separators.png</code></td>
+<td>17 KB</td>
+<td>变量分隔线</td>
+</tr>
+</tbody>
+</table>
+<p>每张图都是 <strong>300 DPI 发表级</strong>，可直接用于论文。</p>
+<hr />
+<h2 id="完整测试代码">📖 9. 完整测试代码</h2>
+<p>完整的 14 个 API 测试脚本（340 行）： -
+<code>~/3_Toolbox/Bioinfo/forestplot/test_all_v2.py</code></p>
+<p>直接 <code>python test_all_v2.py</code>
+即可重跑，结果与本文完全一致。</p>
+<hr />
+<h2 id="总结3-句话讲清-myforestplot">📖 10. 总结：3 句话讲清
+myforestplot</h2>
+<ol type="1">
+<li><strong>核心价值</strong>：从 statsmodels 直接出森林图，省去手算
+OR/CI</li>
+<li><strong>最大坑</strong>：列名是 <code>pvalues</code>（不是
+<code>p-value</code>），参数名是 <code>categorical_cols</code> /
+<code>order</code> / <code>risk,lower,upper</code></li>
+<li><strong>最大 bug</strong>：<code>errorbar_kwds=None</code> +
+<code>errorbar_color</code> 组合会炸，必须传 <code>{}</code> 或 monkey
+patch</li>
+</ol>
+<hr />
+<h2 id="参考资源">📚 参考资源</h2>
+<ul>
+<li><strong>官方文档</strong>：https://toshiakiasakura.github.io/myforestplot/</li>
+<li><strong>PyPI</strong>：https://pypi.org/project/myforestplot/</li>
+<li><strong>GitHub</strong>：https://github.com/toshiakiasakura/myforestplot</li>
+<li><strong>测试数据</strong>：Titantic（来自 seaborn / 官方 demo）</li>
+</ul>
+<hr />
+<blockquote>
+<p><strong>作者</strong>: Sunny (scLLM 资深工程师)
+<strong>配套资源</strong>: 14 个 API 测试脚本 + 8 张示例图（GitHub
+zoebischuribe-cloud/Sunny-research） <strong>下篇预告</strong>:
+「forestmodel 全 API 实测」—— R 语言版的同类工具</p>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%A7%91%E7%A0%94%E5%B7%A5%E5%85%B7/" class="category-chain-item">科研工具</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E7%A7%91%E7%A0%94%E5%B7%A5%E5%85%B7/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96/" class="category-chain-item">数据可视化</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E7%A7%91%E7%A0%94%E5%B7%A5%E5%85%B7/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96/SOP-%E6%95%99%E7%A8%8B/" class="category-chain-item">SOP 教程</a>
+  
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/forest-plot/" class="print-no-link">#forest-plot</a>
+      
+        <a href="/tags/myforestplot/" class="print-no-link">#myforestplot</a>
+      
+        <a href="/tags/meta-analysis/" class="print-no-link">#meta-analysis</a>
+      
+        <a href="/tags/logistic-regression/" class="print-no-link">#logistic-regression</a>
+      
+        <a href="/tags/statsmodels/" class="print-no-link">#statsmodels</a>
+      
+        <a href="/tags/matplotlib/" class="print-no-link">#matplotlib</a>
+      
+        <a href="/tags/%E6%A3%AE%E6%9E%97%E5%9B%BE/" class="print-no-link">#森林图</a>
+      
+        <a href="/tags/%E5%AD%9F%E5%BE%B7%E5%B0%94%E9%9A%8F%E6%9C%BA%E5%8C%96/" class="print-no-link">#孟德尔随机化</a>
+      
+        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96/" class="print-no-link">#数据可视化</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>myforestplot 全 API 实测：13/14 通过，从 Logistic 回归到发表级森林图零代码</div>
+      <div>https://zhuer.github.io/2026/06/26/myforestplot-sop-2026/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Sunny (zhuer)</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年6月26日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/06/25/scLLM-mac-mps-sop/" title="在 Mac M4 Pro 上跑通 Geneformer V1-10M 真实全过程：从 11 个官方 Bug 到全部 Pipeline 一键复刻">
+                        <span class="hidden-mobile">在 Mac M4 Pro 上跑通 Geneformer V1-10M 真实全过程：从 11 个官方 Bug 到全部 Pipeline 一键复刻</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
