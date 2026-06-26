@@ -1,6 +1,20 @@
-# BrainRing 完整使用 SOP：交互式脑连接弦图可视化工具
-
-> 一线实战：BrainRing v1.0 单文件 HTML 工具，集成 8 套脑图谱 + 全参数交互 + SVG/PNG 导出。fMRI/EEG 神经影像科研必备，无需安装 Python/MATLAB，浏览器即开即用。
+---
+title: BrainRing 完整使用 SOP：浏览器即开即用的脑连接弦图可视化工具
+date: 2026-06-26 16:30:00
+abbrlink: brainring-sop
+tags:
+  - SOP
+  - 可视化
+  - 脑连接
+  - 神经影像
+  - fMRI
+  - D3.js
+categories:
+  - 科研工具
+  - 数据可视化
+  - SOP 教程
+description: 单文件 HTML 工具，集成 8 套脑图谱（Brainnetome-246 / AAL-90/116 / Schaefer-100/200/400 / Power-264 / Dosenbach-160）+ 自定义 CSV 图谱 + FC 矩阵导入 + 全参数交互 + SVG/PNG 导出。零安装，浏览器即开即用。
+---
 
 ---
 
